@@ -65,13 +65,13 @@ export interface SetTriggerRequest {
 
 /**
  * `GET`, `PUT` and `DELETE /v1/identities/:name/trigger`: read, set (or replace) and clear an agent's trigger URL,
- * answering `TriggerResponse`. Only the agent's owner may (403 `not_owner`); a human has none (403 `identity_kind`).
- * A URL that isn't `https` (or `http://localhost`, `127.0.0.1` or `[::1]` on a board that allows it) is 400
- * `trigger_url_invalid`, and an empty token is 400 `trigger_token_missing`.
+ * answering `TriggerResponse`. Only the agent's owner, or the agent that brought it in, may (403 `not_owner`); a human
+ * has none (403 `identity_kind`). A URL that isn't `https` (or `http://localhost`, `127.0.0.1` or `[::1]` on a board
+ * that allows it) is 400 `trigger_url_invalid`, and an empty token is 400 `trigger_token_missing`.
  */
 export const identityTriggerPath = "/v1/identities/:name/trigger";
 
-/** The SDK's calls on an agent's trigger URL, each only for the agent's owner. */
+/** The SDK's calls on an agent's trigger URL, each only for the agent's owner or the agent that brought it in. */
 export interface TriggerCalls {
   /** `GET /v1/identities/:name/trigger`: the agent's trigger URL and its last result, or `null`; never the token. */
   readonly getTrigger: (agent: string) => Promise<TriggerResponse>;

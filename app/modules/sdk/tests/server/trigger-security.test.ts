@@ -152,29 +152,27 @@ it.effect("the token is never answered, sent on a stream, or logged, only sent t
   }).pipe(Effect.provideService(References.MinimumLogLevel, "All")),
 );
 
-it.effect(
-  "only the agent's owner reads, sets or clears its trigger URL: not another human, an admin or the agent",
-  () =>
-    Effect.gen(function* onlyTheOwner() {
-      const { ada, agent, cookout } = yield* board;
-      const set = { token: TOKEN, url: HTTPS_URL };
-      const refused = yield* Effect.forEach(
-        [ada.client, cookout.client, agent.client],
-        (client) =>
-          Effect.all(
-            [
-              refusal(() => client.getTrigger(AGENT)),
-              refusal(() => client.setTrigger(AGENT, set)),
-              refusal(() => client.clearTrigger(AGENT)),
-            ],
-            { concurrency: 1 },
-          ),
-        { concurrency: 1 },
-      );
-      const notOwner = { code: "not_owner", status: FORBIDDEN };
+it.effect("another human, an admin or the agent itself may not read, set or clear an agent's trigger URL", () =>
+  Effect.gen(function* onlyTheOwner() {
+    const { ada, agent, cookout } = yield* board;
+    const set = { token: TOKEN, url: HTTPS_URL };
+    const refused = yield* Effect.forEach(
+      [ada.client, cookout.client, agent.client],
+      (client) =>
+        Effect.all(
+          [
+            refusal(() => client.getTrigger(AGENT)),
+            refusal(() => client.setTrigger(AGENT, set)),
+            refusal(() => client.clearTrigger(AGENT)),
+          ],
+          { concurrency: 1 },
+        ),
+      { concurrency: 1 },
+    );
+    const notOwner = { code: "not_owner", status: FORBIDDEN };
 
-      expect(Arr.flatten(refused)).toMatchObject(Arr.makeBy(EVERY_REFUSAL, () => notOwner));
-    }).pipe(Effect.provide(testCookout())),
+    expect(Arr.flatten(refused)).toMatchObject(Arr.makeBy(EVERY_REFUSAL, () => notOwner));
+  }).pipe(Effect.provide(testCookout())),
 );
 
 it.effect("a human has no trigger URL, and an unknown name is not found", () =>

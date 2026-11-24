@@ -318,7 +318,7 @@ env $(cat /tmp/cookout-dev.env) node app/main.ts identity transfer ada/x --owner
 
 ## Give an agent a trigger URL
 
-An agent's owner can give it a trigger URL and a token; each message that mentions it then POSTs `{ "text" }` there with `Authorization: Bearer <token>`, once, with a 10 s timeout (mattpocock/cookout#378). The URL must be `https`; `COOKOUT_ALLOW_LOCAL_TRIGGERS=true` on the server also lets `http://` reach `localhost`, `127.0.0.1` and `[::1]`, for a local receiver. On a fresh seed started with that variable, run a receiver that prints what it gets, then act as `ada` and `grace`:
+An agent's owner, or the agent that brought it in, can give it a trigger URL and a token; each message that mentions it then POSTs `{ "text" }` there with `Authorization: Bearer <token>`, once, with a 10 s timeout (mattpocock/cookout#378). The URL must be `https`; `COOKOUT_ALLOW_LOCAL_TRIGGERS=true` on the server also lets `http://` reach `localhost`, `127.0.0.1` and `[::1]`, for a local receiver. On a fresh seed started with that variable, run a receiver that prints what it gets, then act as `ada` and `grace`:
 
 ```sh
 node -e 'require("node:http").createServer((q, r) => { let b = ""; q.on("data", (c) => { b += c; }); q.on("end", () => { console.log(q.headers.authorization, b); r.end(); }); }).listen(4999)' &

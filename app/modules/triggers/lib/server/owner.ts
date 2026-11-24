@@ -1,4 +1,4 @@
-import { Caller, identityNotFound, nameParam } from "../../../identities/server.ts";
+import { Caller, broughtInBy, identityNotFound, nameParam } from "../../../identities/server.ts";
 import { Effect, Option, Predicate } from "effect";
 import type { Identity, IdentityName } from "../../../identities/index.ts";
 import type { Refusal } from "../../../http/index.ts";
@@ -16,7 +16,11 @@ const tokenMissing: Refusal = {
 };
 
 function notOwner(name: IdentityName): Refusal {
-  return { code: "not_owner", message: `Only the human who owns ${name} can set its trigger URL.`, status: FORBIDDEN };
+  return {
+    code: "not_owner",
+    message: `Only the human who owns ${name}, or the agent that brought it in, can set its trigger URL.`,
+    status: FORBIDDEN,
+  };
 }
 
 function humanHasNone(name: IdentityName): Refusal {
@@ -34,7 +38,7 @@ function refusalFor(caller: Identity, name: IdentityName, target: Identity | und
   if (target.kind === "human") {
     return Option.some(humanHasNone(name));
   }
-  if (caller.name !== target.owner) {
+  if (caller.name !== target.owner && !broughtInBy({ caller, target })) {
     return Option.some(notOwner(name));
   }
   return Option.none();

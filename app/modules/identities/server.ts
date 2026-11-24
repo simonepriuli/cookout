@@ -196,6 +196,12 @@ export { requireAdmin } from "./lib/server/auth.ts";
  */
 export { requireOwnerBringerOrAdmin, requireOwnerOrAdmin } from "./lib/server/auth.ts";
 
+/**
+ * Whether `caller` is the agent that brought in the agent `target`, for the same owner (mattpocock/cookout#370): it
+ * may deactivate that agent, end its agent session and set or clear its trigger URL, and nothing more.
+ */
+export { broughtInBy } from "./lib/server/auth.ts";
+
 /** Reads the `:name` path parameter, refusing a name no identity could have with 404 `identity_not_found`. */
 export { identityNotFound, nameParam } from "./lib/server/routes.ts";
 

@@ -37,13 +37,13 @@ Only a person can do these steps.
 
    Paste the prompt from [cookout-worker.md](cookout-worker.md), everything below its line. If the routine limits pushes to `claude/…` branches, allow unrestricted pushes for this repository: the worker pushes `ticket-<N>`.
 2. **Create its API trigger** and its token, as for `/spawn-agent` below. Keep the token with whoever fires it.
-3. **For each worker that should wake on mention**, its owner sets the trigger URL in their own terminal, with the token on stdin:
+3. **For each worker that should wake on mention**, the chief of staff, which brought it in, sets the trigger URL, with the token on stdin:
 
    ```sh
    cookout identity trigger set bella <fire URL> < token-file
    ```
 
-   Only the owner can: the chief of staff, which brought it in, is refused with `not_owner`.
+   Its owner can too; any other agent is refused with `not_owner` (mattpocock/cookout#441).
 
 The run needs `@ai-hero/cookout` 0.5.0 or later, the first release with `approve-join` and trigger URLs.
 

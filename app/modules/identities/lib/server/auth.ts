@@ -244,6 +244,7 @@ export {
   AgentSessionSent,
   Caller,
   HarnessSent,
+  broughtInBy,
   CommandThread,
   type Credentials,
   credentialsOf,

@@ -226,6 +226,59 @@ it.effect("an agent may not end the agent session of, or deactivate, an agent it
   }).pipe(Effect.provide(testCookout())),
 );
 
+const trigger = { token: "routine-secret-6c1f", url: "https://routines.example.com/fire" };
+
+it.effect("an agent reads, sets and clears the trigger URL of an agent it brought in", () =>
+  Effect.gen(function* bringerSetsTrigger() {
+    const on = yield* board;
+    yield* approvedByChief(on);
+    const set = yield* answer(() => on.chief.client.setTrigger("worker", trigger));
+    const read = yield* answer(() => on.chief.client.getTrigger("worker"));
+    const cleared = yield* answer(() => on.chief.client.clearTrigger("worker"));
+
+    expect([set, read, cleared]).toStrictEqual([
+      { trigger: { url: trigger.url } },
+      { trigger: { url: trigger.url } },
+      { trigger: null },
+    ]);
+  }).pipe(Effect.provide(testCookout())),
+);
+
+it.effect(
+  "another agent of the same owner may not read, set or clear the trigger URL of an agent it didn't bring in",
+  () =>
+    Effect.gen(function* otherAgentRefused() {
+      const on = yield* board;
+      const deputy = yield* on.cookout.createIdentity("deputy", { owner: "ada" });
+      yield* approvedByChief(on);
+      const refused = yield* Effect.all(
+        [
+          refusal(() => deputy.client.getTrigger("worker")),
+          refusal(() => deputy.client.setTrigger("worker", trigger)),
+          refusal(() => deputy.client.clearTrigger("worker")),
+        ],
+        { concurrency: 1 },
+      );
+
+      expect(refused).toMatchObject([
+        { code: "not_owner", status: FORBIDDEN },
+        { code: "not_owner", status: FORBIDDEN },
+        { code: "not_owner", status: FORBIDDEN },
+      ]);
+    }).pipe(Effect.provide(testCookout())),
+);
+
+it.effect("the owner still sets and clears the trigger URL of an agent its agent brought in", () =>
+  Effect.gen(function* ownerSetsTrigger() {
+    const on = yield* board;
+    yield* approvedByChief(on);
+    const set = yield* answer(() => on.ada.client.setTrigger("worker", trigger));
+    const cleared = yield* answer(() => on.ada.client.clearTrigger("worker"));
+
+    expect([set, cleared]).toStrictEqual([{ trigger: { url: trigger.url } }, { trigger: null }]);
+  }).pipe(Effect.provide(testCookout())),
+);
+
 it.effect("an agent gets no other new powers over an agent it brought in", () =>
   Effect.gen(function* noOtherPowers() {
     const on = yield* board;
