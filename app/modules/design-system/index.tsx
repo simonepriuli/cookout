@@ -121,7 +121,7 @@
  * `key`, pressed while the message itself has focus, leaves it too, in or out of the hover bar. Its `menu` gives it one actions menu (the action,
  * then each reaction, then Mark unread, then the thread choice, such as Close, if any), drawn two ways on Radix: right-clicking the message, or the context-menu key or Shift+F10 on it, opens it as a context menu at the pointer, and the
  * More actions button opens it as a dropdown. Every menu item draws its `icon` (a `ThreadChoice` names one too), which its type requires, before its label. An item may be `disabled`, dimmed and not chosen. Radix gives both their keyboard and focus behaviour; a chosen item's
- * action runs once the menu has closed. Mark unread's tooltip names its shortcut, `Alt-click`: an Alt-click (Option-click
+ * action runs once the menu has closed. An item given `keys` (a `Shortcut`) names them in `aria-keyshortcuts` and shows their label at its end. Mark unread's tooltip names its shortcut, `Alt-click`: an Alt-click (Option-click
  * on macOS) on the message, but not on a link, button or other interactive element in it, runs Mark unread at once and
  * focuses and selects nothing; `StandaloneMessage` does the same. `StandaloneMessage` is one named message on its own, such as a
  * thread's parent. A message's author name and an `@name` in its text are each an `IdentityCard`: hovering it
@@ -149,7 +149,8 @@
  * `AppShell` is the page around the login view; `Card`, centred in a scrolling column, `CardHeader`, `Heading` and
  * `Muted` are a shadcn-style card and its title row, `CardBody` a padded section under it; `MutedLines` is muted text
  * that keeps its line breaks; `LinkList` and `LinkRow` are a named list of links, and `ItemList` and `ItemRow` a named
- * list of plain rows; `Alert` is a refusal, read out by screen readers; `Notice` is a passing word on what just
+ * list of plain rows; `Alert` is a refusal, read out by screen readers; `Announcement` a polite live region (its text
+ * again as its count moves); `Notice` is a passing word on what just
  * happened, read out politely; `Skeleton` stands in while something loads. `Form` hands one field's value to `onSubmit`
  * without reloading the page; `TextField` is a labelled secret input in it, such as a token, `TextArea` a labelled box
  * to write in, such as a reply, whose text and caret its owner holds, where Enter sends the form and Shift+Enter starts
@@ -277,6 +278,7 @@ export {
 } from "./lib/controls.ts";
 export {
   Alert,
+  Announcement,
   Heading,
   ItemList,
   ItemRow,

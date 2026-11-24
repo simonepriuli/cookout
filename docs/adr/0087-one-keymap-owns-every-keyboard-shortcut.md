@@ -25,3 +25,5 @@
 Superseded in part on 2026-11-24 by [ADR 0090](0090-tests-get-no-keymap-owner-exemption.md): test files no longer get the lint rule's exemption.
 
 Superseded in part on 2026-11-24 by [ADR 0091](0091-mod-is-cmd-on-a-mac-and-ctrl-elsewhere.md): `Mod` matches Cmd on a Mac and Ctrl elsewhere, not either key everywhere.
+
+Superseded in part on 2026-11-24 by [ADR 0092](0092-a-keymap-binding-gives-some-of-its-scopes-actions.md): a binding gives some or all of its scope's actions, and a channel row and the sidebar join `SCOPES` before the Inbox.

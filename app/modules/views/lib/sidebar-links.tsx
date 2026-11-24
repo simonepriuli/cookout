@@ -1,9 +1,9 @@
 import { NavHeading, NavLink, NavList } from "../../design-system/index.tsx";
 import { useMemo, useSyncExternalStore } from "react";
 import type { Board } from "../../board/index.ts";
-import type { ChannelName } from "../../sdk/index.ts";
 import { ChannelRows } from "./channel-rows.tsx";
 import { InboxLink } from "./inbox-link.tsx";
+import type { Keymap } from "../../keymap/index.ts";
 import type { Looking } from "./use-unread-levels.ts";
 import { NewChannel } from "./new-channel.tsx";
 import { NewChannelButton } from "./new-channel-button.tsx";
@@ -20,17 +20,13 @@ const TEXT = {
 
 interface SidebarLinksProps {
   readonly board: Board;
+  readonly keymap: Keymap;
   readonly route: Route;
   readonly unread: Looking["unread"];
   readonly me: string;
 }
 
-function openChannel(route: Route): ChannelName | null {
-  if (route.name === "channel" || route.name === "thread") {
-    return route.channel;
-  }
-  return null;
-}
+export type { SidebarLinksProps };
 
 export function SidebarLinks(props: SidebarLinksProps): ReactNode {
   const { route } = props;
@@ -38,8 +34,8 @@ export function SidebarLinks(props: SidebarLinksProps): ReactNode {
   const unread = useSyncExternalStore(props.unread.subscribe, props.unread.snapshot);
   const counts = useSidebarCounts({ me: props.me, state: unread });
   const actions = useMemo(
-    () => ({ subscriptions: props.board.subscriptions, unread: props.unread }),
-    [props.board.subscriptions, props.unread],
+    () => ({ keymap: props.keymap, subscriptions: props.board.subscriptions, unread: props.unread }),
+    [props.board.subscriptions, props.keymap, props.unread],
   );
   return (
     <>
@@ -56,7 +52,7 @@ export function SidebarLinks(props: SidebarLinksProps): ReactNode {
       <NavHeading label={TEXT.channels}>
         <NewChannelButton creation={props.board.creation} />
       </NavHeading>
-      <ChannelRows actions={actions} channels={channels} open={openChannel(route)} counts={counts.channels} />
+      <ChannelRows actions={actions} channels={channels} route={route} counts={counts.channels} />
       <NewChannel creation={props.board.creation} />
     </>
   );

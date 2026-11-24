@@ -22,7 +22,13 @@ async function menuItems(name: string): Promise<Shown> {
   const shown = await screen.findByRole("menu", { name });
   const items: (readonly [string, boolean, boolean])[] = [];
   for (const item of within(shown).getAllByRole("menuitem")) {
-    items.push([item.textContent, item.querySelector(ICON_FIRST) !== null, "disabled" in item.dataset]);
+    let label = "";
+    for (const node of item.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        label += node.textContent ?? "";
+      }
+    }
+    items.push([label, item.querySelector(ICON_FIRST) !== null, "disabled" in item.dataset]);
   }
   return items;
 }

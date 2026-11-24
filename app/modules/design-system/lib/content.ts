@@ -1,4 +1,5 @@
 export { Alert } from "./alert.tsx";
+export { Announcement } from "./announcement.tsx";
 export { Heading } from "./heading.tsx";
 export { ItemList } from "./item-list.tsx";
 export { ItemRow } from "./item-row.tsx";

@@ -1,4 +1,6 @@
 import type { MenuIcon } from "./menu-icons.ts";
+import type { ReactNode } from "react";
+import type { Shortcut } from "./shortcut.ts";
 
 interface ReactionChoice {
   readonly symbol: string;
@@ -37,8 +39,20 @@ type MenuChoice =
       readonly href: null;
       readonly onSelect: () => void;
       readonly shortcut?: string;
+      readonly keys?: Shortcut;
       readonly disabled?: boolean;
     });
+
+type ActionChoice = Extract<MenuChoice, { readonly href: null }>;
+
+interface MenuItemShape {
+  readonly asChild: true;
+  readonly onSelect?: () => void;
+  readonly disabled?: boolean;
+  readonly children: ReactNode;
+}
+
+type MenuItem = (props: MenuItemShape) => ReactNode;
 
 interface ActionMenuParts {
   readonly choices: readonly MenuChoice[];
@@ -54,9 +68,11 @@ interface HoverActionsParts extends MessageActionParts {
 }
 
 export type {
+  ActionChoice,
   ActionMenuParts,
   HoverActionsParts,
   MenuChoice,
+  MenuItem,
   MessageActionParts,
   MessageMenuParts,
   ReactionChoice,

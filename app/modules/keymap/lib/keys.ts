@@ -1,14 +1,16 @@
-const SCOPES = ["search box", "text box", "profile panel", "inbox", "everywhere"] as const;
+const SCOPES = ["search box", "text box", "profile panel", "channel row", "sidebar", "inbox", "everywhere"] as const;
 
 type Scope = (typeof SCOPES)[number];
 
 const TEXT_SCOPES: ReadonlySet<Scope> = new Set(["search box", "text box"]);
 
 const GROUPS: Readonly<Record<Scope, string>> = {
+  "channel row": "Channel in the sidebar",
   everywhere: "Everywhere",
   inbox: "Inbox row",
   "profile panel": "Profile panel",
   "search box": "Search box",
+  sidebar: "Sidebar",
   "text box": "Message box",
 };
 
@@ -16,6 +18,24 @@ const KEYS = [
   { action: "openSearch", chord: "Mod+K", does: "Open the search box", scope: "everywhere" },
   { action: "openShortcutList", chord: "?", does: "Show the keyboard shortcuts", scope: "everywhere" },
   { action: "openShortcutList", chord: "Mod+/", does: "Show the keyboard shortcuts", scope: "everywhere" },
+  { action: "nextChannel", chord: "Alt+ArrowDown", does: "Open the next channel", scope: "everywhere" },
+  { action: "previousChannel", chord: "Alt+ArrowUp", does: "Open the previous channel", scope: "everywhere" },
+  {
+    action: "nextUnreadChannel",
+    chord: "Alt+Shift+ArrowDown",
+    does: "Open the next channel with unread messages",
+    scope: "everywhere",
+  },
+  {
+    action: "previousUnreadChannel",
+    chord: "Alt+Shift+ArrowUp",
+    does: "Open the previous channel with unread messages",
+    scope: "everywhere",
+  },
+  { action: "nextLink", chord: "ArrowDown", does: "Next link", scope: "sidebar" },
+  { action: "previousLink", chord: "ArrowUp", does: "Previous link", scope: "sidebar" },
+  { action: "markChannelRead", chord: "e", does: "Mark all as read", scope: "channel row" },
+  { action: "toggleSubscription", chord: "s", does: "Subscribe or unsubscribe", scope: "channel row" },
   { action: "highlightNext", chord: "ArrowDown", does: "Highlight the next result", scope: "search box" },
   { action: "highlightPrevious", chord: "ArrowUp", does: "Highlight the previous result", scope: "search box" },
   { action: "openHighlighted", chord: "Enter", does: "Open the highlighted result", scope: "search box" },

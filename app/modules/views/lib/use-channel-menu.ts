@@ -3,11 +3,13 @@ import type { Subscriptions, SubscriptionsState } from "../../board/index.ts";
 import type { Unread, UnreadCounts } from "../../unread/index.ts";
 import { useMemo, useSyncExternalStore } from "react";
 import type { ChannelName } from "../../sdk/index.ts";
+import type { Keymap } from "../../keymap/index.ts";
 import { hasUnread } from "./unread-counts.ts";
 
 const TEXT = { markRead: "Mark all as read", subscribe: "Subscribe", unsubscribe: "Unsubscribe" } as const;
 
 interface ChannelActions {
+  readonly keymap: Keymap;
   readonly subscriptions: Subscriptions;
   readonly unread: Unread;
 }
@@ -19,6 +21,7 @@ interface ChannelMenuOf extends ChannelActions {
 
 interface SubscriptionOf {
   readonly channel: ChannelName;
+  readonly keymap: Keymap;
   readonly state: SubscriptionsState;
   readonly subscriptions: Subscriptions;
 }
@@ -30,7 +33,7 @@ function wordsOf(subscribed: boolean): Pick<MenuChoice, "icon" | "label"> {
   return { icon: "subscribe", label: TEXT.subscribe };
 }
 
-function subscriptionChoices({ channel, state, subscriptions }: SubscriptionOf): readonly MenuChoice[] {
+function subscriptionChoices({ channel, keymap, state, subscriptions }: SubscriptionOf): readonly MenuChoice[] {
   if (state.status !== "loaded") {
     return [];
   }
@@ -39,10 +42,12 @@ function subscriptionChoices({ channel, state, subscriptions }: SubscriptionOf):
   function flip(): void {
     subscriptions.setSubscribed(channel, !subscribed, "channel-menu");
   }
-  return [{ ...wordsOf(subscribed), disabled, href: null, onSelect: flip }];
+  return [
+    { ...wordsOf(subscribed), disabled, href: null, keys: keymap.shortcutOf("toggleSubscription"), onSelect: flip },
+  ];
 }
 
-function useChannelMenu({ channel, counts, subscriptions, unread }: ChannelMenuOf): ActionMenuParts {
+function useChannelMenu({ channel, counts, keymap, subscriptions, unread }: ChannelMenuOf): ActionMenuParts {
   const state = useSyncExternalStore(subscriptions.subscribe, subscriptions.snapshot);
   const unseen = hasUnread(counts);
   return useMemo(() => {
@@ -51,12 +56,19 @@ function useChannelMenu({ channel, counts, subscriptions, unread }: ChannelMenuO
     }
     return {
       choices: [
-        { disabled: !unseen, href: null, icon: "mark-read", label: TEXT.markRead, onSelect: markRead },
-        ...subscriptionChoices({ channel, state, subscriptions }),
+        {
+          disabled: !unseen,
+          href: null,
+          icon: "mark-read",
+          keys: keymap.shortcutOf("markChannelRead"),
+          label: TEXT.markRead,
+          onSelect: markRead,
+        },
+        ...subscriptionChoices({ channel, keymap, state, subscriptions }),
       ],
       label: `#${channel} actions`,
     };
-  }, [channel, state, subscriptions, unread, unseen]);
+  }, [channel, keymap, state, subscriptions, unread, unseen]);
 }
 
 export { type ChannelActions, useChannelMenu };

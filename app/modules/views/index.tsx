@@ -11,7 +11,14 @@
  * People & agents link, every channel sorted by name, bold when it has unread
  * messages, with its mention count as a pill (its unread count read out only),
  * or why the channels can't load, the open item highlighted, and the
- * logged-in human with a Settings link. `SettingsView` is the settings page,
+ * logged-in human with a Settings link; its links are one Tab stop (the last
+ * focused, else the open item), ↑ and ↓ moving between them. `SidebarKeys`
+ * binds the channel keys beside it: Alt+↑ and Alt+↓ open the previous and next
+ * channel in the sidebar's order from anywhere, wrapping round, and with Shift
+ * the previous and next with unread messages ("No unread channels" when none
+ * is left); on a focused channel row E marks it all read and S subscribes or
+ * unsubscribes, the channel menu showing both keys. What they do is read out
+ * by its `Announcement`. `SettingsView` is the settings page,
  * a section for each part with a heading that links to it (a link to one
  * section focuses its heading): Profile, a form for the human's own display
  * name and one for each agent they own (the `composer` store: saving shows at
@@ -145,5 +152,6 @@ export { SettingsView } from "./lib/settings.tsx";
 export { SearchBox } from "./lib/search-box.tsx";
 export { ShortcutListView } from "./lib/shortcut-list.tsx";
 export { SidebarView } from "./lib/sidebar.tsx";
+export { SidebarKeys } from "./lib/sidebar-keys.tsx";
 export { ThreadCardComposer } from "./lib/thread-card-composer.tsx";
 export { ThreadView } from "./lib/thread.tsx";

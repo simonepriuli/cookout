@@ -4,8 +4,8 @@
  * it does and the scope it applies in. `createKeymap` is made once in the web
  * entry, for the browser's platform, and passed down through `CookoutApp`,
  * whose `listen` adds the page's one key listener.
- * A view says what an action does with `bind`: a scope, what each of its
- * actions does there and, optionally, the element the scope covers (without one it covers
+ * A view says what an action does with `bind`: a scope, what some or all of its
+ * actions do there (several views may each bind their own actions of one scope, such as `everywhere`) and, optionally, the element the scope covers (without one it covers
  * the page while bound). On each key not already handled (nor mid-composition, nor
  * without a key, as autofill sends), the listener walks
  * `SCOPES` from the innermost (the search box) out to `everywhere`, takes the
@@ -39,7 +39,7 @@ type Act = (event: KeyboardEvent) => boolean;
 
 interface Binding<Covered extends Scope> {
   readonly scope: Covered;
-  readonly actions: Readonly<Record<ActionOf<Covered>, Act>>;
+  readonly actions: Readonly<Partial<Record<ActionOf<Covered>, Act>>>;
   readonly within?: () => Element | null;
 }
 
@@ -104,10 +104,14 @@ function covers(bound: Bound, target: EventTarget | null): boolean {
   return element !== null && target instanceof Node && element.contains(target);
 }
 
-function rowsOf(scope: Scope, actions: Readonly<Record<string, Act>>): readonly Row[] {
-  return Object.entries(actions).flatMap(([action, act]: readonly [string, Act]) =>
-    KEYS.filter((key) => key.scope === scope && key.action === action).map((key) => ({ act, key })),
-  );
+function rowsOf(scope: Scope, actions: Readonly<Partial<Record<string, Act>>>): readonly Row[] {
+  return KEYS.filter((key) => key.scope === scope).flatMap((key) => {
+    const act = actions[key.action];
+    if (typeof act !== "function") {
+      return [];
+    }
+    return [{ act, key }];
+  });
 }
 
 function actOn({ bound, event, platform }: Pressing): boolean {
