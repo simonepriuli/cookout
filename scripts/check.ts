@@ -1,6 +1,9 @@
 import type { Check, CiOnly } from "./lib/check-runner.ts";
+import { browserSkip, browserTestsFor } from "./lib/browser-selection.ts";
+import type { BrowserTests } from "./lib/browser-selection.ts";
 import { SUITE_LOCK_FILE } from "./lib/machine-lock.ts";
 import { TIMINGS_DIR } from "./lib/slowest-files.ts";
+import { changedFiles } from "./lib/changed-files.ts";
 import path from "node:path";
 import { runChecks } from "./lib/check-runner.ts";
 
@@ -40,6 +43,26 @@ function lintScript(): readonly string[] {
   return ["lint"];
 }
 
+const NONE = 0;
+
+function selectedBrowserTests(): BrowserTests {
+  if (inCi || job !== "") {
+    return { all: true, reason: "" };
+  }
+  const cwd = process.cwd();
+  return browserTestsFor({ changed: changedFiles({ base: "origin/v1", cwd }), cwd });
+}
+
+const browserTests = selectedBrowserTests();
+const browserSkipped = browserSkip(browserTests);
+
+function browserScript(): readonly string[] {
+  if (browserTests.all) {
+    return ["browser"];
+  }
+  return ["browser", ...browserTests.run];
+}
+
 const scripted: readonly Scripted[] = [
   { budget: 16, job: "lint", name: "lint", script: lintScript() },
   { budget: 18, job: "canaries", name: "canaries", script: ["canaries"] },
@@ -57,7 +80,7 @@ const scripted: readonly Scripted[] = [
     budget: 30,
     job: "browser",
     name: "browser",
-    script: ["browser"],
+    script: browserScript(),
     timings: {
       base: "app/modules/routes/tests/browser",
       file: path.join(TIMINGS_DIR, "browser.json"),
@@ -77,10 +100,17 @@ function commandOf({ script, ...check }: Scripted): Check {
   return Object.assign(check, { command: ["pnpm", "run", "--silent", ...script] });
 }
 
-const checks: readonly Check[] = scripted.map((check) => commandOf(check));
+const checks: readonly Check[] = scripted
+  .filter((check) => check.job !== "browser" || browserTests.all || browserTests.run.length > NONE)
+  .map((check) => commandOf(check));
 
 const ciOnly: readonly CiOnly[] = [
   { ciJob: "e2e-docker", command: "pnpm e2e:docker", name: "the e2e suite (packages/e2e on the Docker image)" },
+  ...browserSkipped,
 ];
+
+if (browserTests.all && browserTests.reason !== "") {
+  console.error(`check: running every browser test, since ${browserTests.reason}.`);
+}
 
 process.exitCode = await runChecks({ checks, ciOnly, inCi, job, lockFile: SUITE_LOCK_FILE });
