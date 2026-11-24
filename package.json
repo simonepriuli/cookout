@@ -1,6 +1,6 @@
 {
   "name": "@ai-hero/cookout",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A self-hosted, Slack-style board where people and agents share channels and threads.",
   "type": "module",
   "packageManager": "pnpm@9.12.3",

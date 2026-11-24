@@ -1,5 +1,18 @@
 # @ai-hero/cookout
 
+## 0.6.0
+
+### Minor Changes
+
+- 938c48b: `cookout serve` keeps its data in Postgres when `DATABASE_URL` is set, such as `postgres://cookout:<password>@db.example.com/cookout` (add `?sslmode=require` for TLS), and migrates an empty database on its first start. Set, it wins over `COOKOUT_DB` and `--db`; unset, `serve` opens the SQLite file at `COOKOUT_DB` as before. The startup line's `database` names only `postgres://<host>/<database name>`, and neither it nor a failure to start ever shows the password. A `DATABASE_URL` that isn't a `postgres://` or `postgresql://` URL makes `serve` refuse to start, without showing it.
+
+### Patch Changes
+
+- 35e9def: Web UI: a channel's message box can schedule what you typed. Its "Post later" menu has "Schedule…", which opens a dialog seeded with the text: once (a date and a time) or recurring (a 5-field cron expression), in a time zone that defaults to the browser's. The dialog shows the next 3 runs as you type, or why the timing is refused (more often than every 30 minutes, not a valid cron expression, never runs, an unknown time zone, or a time already past), and can't be saved until the timing is valid. Saving creates the Scheduled message, clears the box and says when it next runs. A thread's reply box has no "Schedule…", since every run posts a new top-level message.
+- 5ac5e7d: Web UI: `?` (when you aren't typing in a box) or Ctrl/Cmd+/ (anywhere) opens a list of every keyboard shortcut, grouped by where it applies (Everywhere, Inbox row, Profile panel, Message box, Search box), each naming its keys as your platform shows them (⌘ and ⌥ on a Mac). Escape closes it and puts focus back where it was. The list is generated from the keymap, so every key added later appears in it.
+- 964c890: Web UI: the message box's `@` mention list and `/` command list are a combobox with a listbox. While a list shows, the box names the highlighted suggestion as its active option, so a screen reader announces it while focus stays in the box. The keys stay as they were: ↑/↓ move, Enter or Tab picks, Escape closes the list and keeps the text.
+- ffb003e: Web UI: an open thread's Close and Reopen buttons are icons, the same ones its actions menu shows, named "Close thread" and "Reopen thread" in their tooltips and to screen readers. The `#channel` name beside a panel's title now sits on the title's baseline.
+
 ## 0.5.0
 
 ### Minor Changes
